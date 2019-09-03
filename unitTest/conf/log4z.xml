@@ -1,0 +1,44 @@
+<log4z>
+    <!-- 公共日志类 -->
+    <logger name="Common">
+      <appender>CommonAppender</appender>
+    </logger>
+    <!-- 自定义日志类，比如涉及到金融模块，需要单独记录日志到指定路径，这里以微信为示例 -->
+    <logger name="Wechat">
+        <appender>WechatAppender</appender>
+    </logger>
+
+    <!-- LogSize 单个文件的最大大小，单位为Mb，记录的最大等级-->
+    <!--启用等级为大于等于minlevel，小于maxlevel-->
+    <!--MinLevel 日志过滤器所记录的最小等级，左闭右关 debug、info、warn、error、dpanic、panic、fatal-->
+    <!--MaxLevel 日志过滤器所记录的最大等级，左闭右关 debug、info、warn、error、dpanic、panic、fatal-->
+    <!--Encoder 日志信息格式化编码 json格式，console格式-->
+    <!--console是否开启控制台输出 true：开启 false：关闭-->
+    <!--maxBackup日志文件最多保存多少个备份-->
+    <!--maxDay文件最多保存多少天-->
+    <!-- LogPath 日志文件输出的路径-->
+    <!-- 公共日志附加介质-->
+    <appender name="CommonAppender">
+        <levelDefine size="1" min="debug" max="warn" line="false" encoder="json" console="true" maxDay="7" maxBackup="100">
+            <path>D:\\log4z\\info.log</path>
+        </levelDefine>
+        <levelDefine  size="1" min="warn" max="error" line="true"  encoder="json" console="true" maxDay="7" maxBackup="100">
+            <path>D:\\log4z\\warn.log</path>
+        </levelDefine>
+        <levelDefine  size="1" min="error" max="fatal" line="true"  encoder="json" console="true" maxDay="7" maxBackup="100">
+            <path>D:\\log4z\\error.log</path>
+        </levelDefine>
+    </appender>
+    <!-- 自定义日志附加介质-->
+    <appender name="WechatAppender">
+        <levelDefine size="1" min="debug" max="warn" line="false" encoder="json" console="true" maxDay="7" maxBackup="100">
+            <path>D:\\log4zWechat\\info.log</path>
+        </levelDefine>
+        <levelDefine  size="1" min="warn" max="error" line="true"  encoder="json" console="true" maxDay="7" maxBackup="100">
+            <path>D:\\log4zWechat\\warn.log</path>
+        </levelDefine>
+        <levelDefine  size="1" min="error" max="fatal" line="true"  encoder="json" console="true" maxDay="7" maxBackup="100">
+            <path>D:\\log4zWechat\\error.log</path>
+        </levelDefine>
+    </appender>
+</log4z>
