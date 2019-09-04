@@ -40,35 +40,35 @@ func TestConsoleLogger(t *testing.T) {
 
 /*
 func ExampleInit() {
-	var logCommon *zap.Logger //in code set the instance at a static variable
-	var logWechat *zap.Logger //in code set the instance at a static variable
+	var LogCommon *zap.Logger //in code set the instance at a static variable
+	var LogWechat *zap.Logger //in code set the instance at a static variable
 	configPath := "./conf/log4z.xml"
 	err := log4z.InitConfig(configPath)
 	if err != nil {
 		fmt.Printf("warnning: log4z.InitConfig(configPath) configPath=%s; return err=%s\r\n", configPath, err.Error())
 		fmt.Println("warnning: now set all logger to default console logger")
-		logCommon = log4z.GetConsoleLogger()
-		logWechat = log4z.GetConsoleLogger()
+		LogCommon = log4z.GetConsoleLogger()
+		LogWechat = log4z.GetConsoleLogger()
 	} else {
-		logCommon, err = log4z.InitLogger("Common")
+		LogCommon, err = log4z.InitLogger("Common")
 		if err != nil {
 			fmt.Printf("warnning: log4z.InitLogger(Common) return err=%s\r\n", err.Error())
 			fmt.Println("warnning: now set logger Common to default console logger")
-			logCommon = log4z.GetConsoleLogger()
+			LogCommon = log4z.GetConsoleLogger()
 		} else {
-			fmt.Println("init logCommon success")
+			fmt.Println("init LogCommon success")
 		}
-		logWechat, err = log4z.InitLogger("Wechat")
+		LogWechat, err = log4z.InitLogger("Wechat")
 		if err != nil {
 			fmt.Printf("warnning: log4z.InitLogger(Wechat) return err=%s\r\n", err.Error())
 			fmt.Println("warnning: now set logger Wechat to default console logger")
-			logWechat = log4z.GetConsoleLogger()
+			LogWechat = log4z.GetConsoleLogger()
 		} else {
-			fmt.Println("init logWechat success")
+			fmt.Println("init LogWechat success")
 		}
 	}
 	log4z.UnintConfig()
 
-	fmt.Println("logcommon", logCommon)
-	fmt.Println("logWechat", logWechat)
+	fmt.Println("LogCommon", LogCommon)
+	fmt.Println("LogWechat", LogWechat)
 }*/
