@@ -9,9 +9,9 @@
     </logger>
 
     <!-- LogSize 单个文件的最大大小，单位为Mb，记录的最大等级-->
-    <!--启用等级为大于等于minlevel，小于maxlevel-->
-    <!--MinLevel 日志过滤器所记录的最小等级，左闭右关 debug、info、warn、error、dpanic、panic、fatal-->
-    <!--MaxLevel 日志过滤器所记录的最大等级，左闭右关 debug、info、warn、error、dpanic、panic、fatal-->
+    <!--启用等级为大于等于minlevel，小于等于maxlevel-->
+    <!--MinLevel 日志过滤器所记录的最小等级，左闭右闭 debug、info、warn、error、dpanic、panic、fatal-->
+    <!--MaxLevel 日志过滤器所记录的最大等级，左闭右闭 debug、info、warn、error、dpanic、panic、fatal-->
     <!--Encoder 日志信息格式化编码 json格式，console格式-->
     <!--console是否开启控制台输出 true：开启 false：关闭-->
     <!--maxBackup日志文件最多保存多少个备份-->
