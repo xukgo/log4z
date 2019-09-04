@@ -1,4 +1,4 @@
-module log4z
+module github.com/xukgo/log4z
 
 go 1.12
 
