@@ -89,28 +89,27 @@ func createLogger(appendModel *AppenderXmlModel) (*zap.Logger, error) {
 	var core []zapcore.Core
 	for _, v := range appendModel.LevelDefines {
 		minLevel := parseLevel(v.MinLevel)
+		if minLevel > zapcore.FatalLevel {
+			return nil, fmt.Errorf("input error, please recheck MinLevel(%s) in .xml file", v.MinLevel)
+		}
 		maxLevel := parseLevel(v.MaxLevel)
-		if minLevel > zapcore.FatalLevel || maxLevel > zapcore.FatalLevel {
-			return nil, fmt.Errorf("input error, please recheck MinLevel or MaxLevel in .xml file")
+		if maxLevel > zapcore.FatalLevel {
+			return nil, fmt.Errorf("input error, please recheck MaxLevel(%s) in .xml file", v.MaxLevel)
 		}
 		levelFilter := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 			return lvl >= minLevel && lvl <= maxLevel
 		})
 
-		//logPath := v.LogPath
+		logPath := v.LogPath
 		maxSize := v.LogSize
 		hook := lumberjack.Logger{
-			//Filename:   logPath,     // 日志文件路径
-			Filename:   "",          // 日志文件路径
+			Filename:   logPath,     // 日志文件路径
 			MaxSize:    maxSize,     // 每个日志文件保存的最大尺寸 单位：M
 			MaxBackups: v.MaxBackup, // 日志文件最多保存多少个备份
 			MaxAge:     v.MaxDays,   // 文件最多保存多少天
 			Compress:   true,        // 是否压缩
 			LocalTime:  true,
 		}
-		//levelPriority = append(levelPriority,level)
-		//hook = append(hook,h)
-		//var isConsole ,isJson bool
 
 		var WriteSync zapcore.WriteSyncer
 		if v.IsConsole { //控制台和文件同时输出

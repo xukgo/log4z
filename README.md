@@ -15,7 +15,7 @@ new golang package log config for zap
         configPath := "./conf/log4z.xml"
         err := log4z.InitConfig(configPath)
         if err != nil {
-            fmt.Printf("warnning: log4z.InitConfig(configPath) configPath=%s; return err=%s\r\n", err.Error())
+		    fmt.Printf("warnning: log4z.InitConfig(configPath) configPath=%s; return err=%s\r\n", configPath, err.Error())
             fmt.Println("warnning: now set all logger to default console logger")
             logCommon = log4z.GetConsoleLogger()
             logWechat = log4z.GetConsoleLogger()
