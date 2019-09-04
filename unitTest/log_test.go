@@ -1,8 +1,8 @@
 package unitTest
 
 import (
+	"github.com/xukgo/log4z"
 	"go.uber.org/zap"
-	"log4z"
 	"testing"
 )
 

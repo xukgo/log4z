@@ -3,8 +3,8 @@ package unitTest
 import (
 	"encoding/xml"
 	"fmt"
+	"github.com/xukgo/log4z"
 	"io/ioutil"
-	"log4z"
 	"testing"
 )
 
