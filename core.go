@@ -19,7 +19,6 @@ func UnintConfig() {
 }
 
 func InitConfig(path string) error {
-	path = getAbsUrl(path)
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
