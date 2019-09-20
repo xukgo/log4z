@@ -7,37 +7,31 @@ new golang package log config for zap
 
 最后提供了默认console的logger配置，这样在写testcase的时候不用担心logger没有初始化的问题
     
+        
+        
+    var LoggerCommon *zap.Logger
+    var LoggerWechat *zap.Logger
     
-    var LogCommon *zap.Logger 
-    var LogWechat *zap.Logger 
-
-    func init() {
+    func ExampleInit() {        
         configPath := "./conf/log4z.xml"
-        err := log4z.InitConfig(configPath)
-        if err != nil {
-            fmt.Printf("warnning: log4z.InitConfig(configPath) configPath=%s; return err=%s\r\n", configPath, err.Error())
-            fmt.Println("warnning: now set all logger to default console logger")
-            LogCommon = log4z.GetConsoleLogger()
-            LogWechat = log4z.GetConsoleLogger()
+        loggerMap := log4z.InitLogger(configPath)
+        LoggerCommon = getLoggerOrConsole(loggerMap, "Common")
+        LoggerWechat = getLoggerOrConsole(loggerMap, "Wechat")
+    
+        fmt.Println("LoggerCommon", LoggerCommon)
+        fmt.Println("LoggerWechat", LoggerWechat)
+    }
+    
+    func getLoggerOrConsole(dict map[string]*zap.Logger, key string) *zap.Logger {
+        logger, ok := dict[key]
+        if ok {
+            fmt.Printf("info: get logger %s success\r\n", key)
         } else {
-            LogCommon, err = log4z.InitLogger("Common")
-            if err != nil {
-                fmt.Printf("warnning: log4z.InitLogger(Common) return err=%s\r\n", err.Error())
-                fmt.Println("warnning: now set logger Common to default console logger")
-                LogCommon = log4z.GetConsoleLogger()
-            } else {
-                fmt.Println("init LogCommon success")
-            }
-            LogWechat, err = log4z.InitLogger("Wechat")
-            if err != nil {
-                fmt.Printf("warnning: log4z.InitLogger(Wechat) return err=%s\r\n", err.Error())
-                fmt.Println("warnning: now set logger Wechat to default console logger")
-                LogWechat = log4z.GetConsoleLogger()
-            } else {
-                fmt.Println("init LogWechat success")
-            }
+            fmt.Printf("warnning: log4z get logger (%s) failed\r\n", key)
+            fmt.Printf("warnning: now set logger %s to default console logger\r\n", key)
+            logger = log4z.GetConsoleLogger()
         }
-        log4z.UnintConfig()   
+        return logger
     }
 
 根据这样的写法，兼顾了生产代码和测试用例的需求

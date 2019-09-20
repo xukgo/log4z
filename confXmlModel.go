@@ -2,7 +2,7 @@ package log4z
 
 import "encoding/xml"
 
-type LevelDefineXmlModel struct {
+type levelDefineXmlModel struct {
 	LogPath    string `xml:"path"`
 	LogSize    int    `xml:"size,attr"`
 	MinLevel   string `xml:"min,attr"`
@@ -14,18 +14,18 @@ type LevelDefineXmlModel struct {
 	LineRecord bool   `xml:"line,attr"`
 }
 
-type AppenderXmlModel struct {
+type appenderXmlModel struct {
 	Name         string                `xml:"name,attr"`
-	LevelDefines []LevelDefineXmlModel `xml:"levelDefine"`
+	LevelDefines []levelDefineXmlModel `xml:"levelDefine"`
 }
 
-type LoggerXmlModel struct {
+type loggerXmlModel struct {
 	Name         string `xml:"name,attr"`
 	AppenderName string `xml:"appender"`
 }
 
-type ConfXmlRoot struct {
+type confXmlRoot struct {
 	XMLName   xml.Name           `xml:"log4z"`
-	Loggers   []LoggerXmlModel   `xml:"logger"`
-	Appenders []AppenderXmlModel `xml:"appender"`
+	Loggers   []loggerXmlModel   `xml:"logger"`
+	Appenders []appenderXmlModel `xml:"appender"`
 }

@@ -12,25 +12,42 @@ import (
 	"time"
 )
 
-var localRoot *ConfXmlRoot
-
-func UnintConfig() {
-	localRoot = nil
+func InitLogger(filePath string) map[string]*zap.Logger {
+	loggerMap := make(map[string]*zap.Logger)
+	localRoot, err := initConfig(filePath)
+	if err == nil {
+		for _, item := range localRoot.Loggers {
+			loggerMap[item.Name] = getLoggerWithDefault(localRoot, item.Name)
+		}
+	}
+	return loggerMap
 }
 
-func InitConfig(path string) error {
-	content, err := ioutil.ReadFile(path)
+func getLoggerWithDefault(confModel *confXmlRoot, loggerKey string) *zap.Logger {
+	logger, err := initLoggerByName(confModel, loggerKey)
 	if err != nil {
-		return err
+		fmt.Printf("warnning: log4z.initLoggerByName(%s) return err=%s\r\n", loggerKey, err.Error())
+		fmt.Printf("warnning: now set logger %s to default console logger\r\n", loggerKey)
+		logger = GetConsoleLogger()
+	} else {
+		fmt.Printf("info:init logger %s success\r\n", loggerKey)
 	}
 
-	xmlroot := new(ConfXmlRoot)
+	return logger
+}
+
+func initConfig(path string) (*confXmlRoot, error) {
+	content, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	xmlroot := new(confXmlRoot)
 	err = xml.Unmarshal(content, xmlroot)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	localRoot = xmlroot
-	return nil
+	return xmlroot, nil
 }
 
 func parseLevel(str string) zapcore.Level {
@@ -55,16 +72,16 @@ func parseLevel(str string) zapcore.Level {
 	}
 }
 
-func InitLogger(name string) (*zap.Logger, error) {
-	if localRoot == nil {
+func initLoggerByName(confModel *confXmlRoot, name string) (*zap.Logger, error) {
+	if confModel == nil {
 		return nil, fmt.Errorf("you must init logger first")
 	}
 
-	loggerXmlRoot := getLoggerFromRoot(name)
+	loggerXmlRoot := getLoggerFromRoot(confModel, name)
 	if loggerXmlRoot == nil {
 		return nil, fmt.Errorf("cannot find logger by name %s", name)
 	}
-	appenderXmlRoot := getAppenderFromRoot(loggerXmlRoot.AppenderName)
+	appenderXmlRoot := getAppenderFromRoot(confModel, loggerXmlRoot.AppenderName)
 	if appenderXmlRoot == nil {
 		return nil, fmt.Errorf("cannot find appender by name %s", loggerXmlRoot.AppenderName)
 	}
@@ -81,11 +98,11 @@ func GetConsoleLogger() *zap.Logger {
 	return createConsoleOnlyLogger()
 }
 
-func TimeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+func timeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 	enc.AppendString(t.Format("2006-01-02 15:04:05.000"))
 }
 
-func createLogger(appendModel *AppenderXmlModel) (*zap.Logger, error) {
+func createLogger(appendModel *appenderXmlModel) (*zap.Logger, error) {
 	var core []zapcore.Core
 	for _, v := range appendModel.LevelDefines {
 		minLevel := parseLevel(v.MinLevel)
@@ -157,7 +174,7 @@ func createConsoleOnlyLogger() *zap.Logger {
 		StacktraceKey:  "stacktrace",
 		LineEnding:     zapcore.DefaultLineEnding,
 		EncodeLevel:    zapcore.LowercaseLevelEncoder,  // 小写编码器
-		EncodeTime:     TimeEncoder,                    // 时间格式
+		EncodeTime:     timeEncoder,                    // 时间格式
 		EncodeDuration: zapcore.SecondsDurationEncoder, //
 		EncodeCaller:   zapcore.ShortCallerEncoder,     // 短路径编码器
 		EncodeName:     zapcore.FullNameEncoder,
@@ -183,7 +200,7 @@ func createConsoleOnlyLogger() *zap.Logger {
 	logger := zap.New(Core, caller, development)
 	return logger
 }
-func getEncoderConfig(model LevelDefineXmlModel) zapcore.EncoderConfig {
+func getEncoderConfig(model levelDefineXmlModel) zapcore.EncoderConfig {
 	encoderConfig := zapcore.EncoderConfig{
 		TimeKey:        "T",
 		LevelKey:       "level",
@@ -192,7 +209,7 @@ func getEncoderConfig(model LevelDefineXmlModel) zapcore.EncoderConfig {
 		StacktraceKey:  "stacktrace",
 		LineEnding:     zapcore.DefaultLineEnding,
 		EncodeLevel:    zapcore.LowercaseLevelEncoder,  // 小写编码器
-		EncodeTime:     TimeEncoder,                    // 时间格式
+		EncodeTime:     timeEncoder,                    // 时间格式
 		EncodeDuration: zapcore.SecondsDurationEncoder, //
 		EncodeCaller:   zapcore.ShortCallerEncoder,     // 短路径编码器
 		EncodeName:     zapcore.FullNameEncoder,
@@ -205,35 +222,36 @@ func getEncoderConfig(model LevelDefineXmlModel) zapcore.EncoderConfig {
 	return encoderConfig
 }
 
-func getLoggerFromRoot(name string) *LoggerXmlModel {
-	if localRoot == nil {
+func getLoggerFromRoot(confModel *confXmlRoot, name string) *loggerXmlModel {
+	if confModel == nil {
 		return nil
 	}
 
-	if localRoot.Loggers == nil || len(localRoot.Loggers) == 0 {
+	if confModel.Loggers == nil || len(confModel.Loggers) == 0 {
 		return nil
 	}
 
-	for index := range localRoot.Loggers {
-		if strings.ToLower(localRoot.Loggers[index].Name) == strings.ToLower(name) {
-			return &localRoot.Loggers[index]
+	for index := range confModel.Loggers {
+		if strings.ToLower(confModel.Loggers[index].Name) == strings.ToLower(name) {
+			return &confModel.Loggers[index]
 		}
 	}
 
 	return nil
 }
-func getAppenderFromRoot(name string) *AppenderXmlModel {
-	if localRoot == nil {
+
+func getAppenderFromRoot(confModel *confXmlRoot, name string) *appenderXmlModel {
+	if confModel == nil {
 		return nil
 	}
 
-	if localRoot.Appenders == nil || len(localRoot.Appenders) == 0 {
+	if confModel.Appenders == nil || len(confModel.Appenders) == 0 {
 		return nil
 	}
 
-	for index := range localRoot.Appenders {
-		if strings.ToLower(localRoot.Appenders[index].Name) == strings.ToLower(name) {
-			return &localRoot.Appenders[index]
+	for index := range confModel.Appenders {
+		if strings.ToLower(confModel.Appenders[index].Name) == strings.ToLower(name) {
+			return &confModel.Appenders[index]
 		}
 	}
 

@@ -1,6 +1,7 @@
 package unitTest
 
 import (
+	"fmt"
 	"github.com/xukgo/log4z"
 	"go.uber.org/zap"
 	"testing"
@@ -8,19 +9,18 @@ import (
 
 func TestCallInit(t *testing.T) {
 	configPath := "./conf/log4z.xml"
-	err := log4z.InitConfig(configPath)
-	if err != nil {
+	loggerDict := log4z.InitLogger(configPath)
+	if len(loggerDict) == 0 {
 		t.Fail()
 	}
-	logCommon, err := log4z.InitLogger("Common")
-	if err != nil {
+	logCommon, ok := loggerDict["Common"]
+	if !ok {
 		t.Fail()
 	}
-	logWechat, err := log4z.InitLogger("Wechat")
-	if err != nil {
+	logWechat, ok := loggerDict["Wechat"]
+	if !ok {
 		t.Fail()
 	}
-	log4z.UnintConfig()
 
 	logCommon.Info("test for common appender lv Info", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
 	logCommon.Warn("test for common appender lv Warn", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
@@ -38,37 +38,27 @@ func TestConsoleLogger(t *testing.T) {
 	logCommon.Error("test for common appender lv Error", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
 }
 
-/*
 func ExampleInit() {
-	var LogCommon *zap.Logger //in code set the instance at a static variable
-	var LogWechat *zap.Logger //in code set the instance at a static variable
-	configPath := "./conf/log4z.xml"
-	err := log4z.InitConfig(configPath)
-	if err != nil {
-		fmt.Printf("warnning: log4z.InitConfig(configPath) configPath=%s; return err=%s\r\n", configPath, err.Error())
-		fmt.Println("warnning: now set all logger to default console logger")
-		LogCommon = log4z.GetConsoleLogger()
-		LogWechat = log4z.GetConsoleLogger()
-	} else {
-		LogCommon, err = log4z.InitLogger("Common")
-		if err != nil {
-			fmt.Printf("warnning: log4z.InitLogger(Common) return err=%s\r\n", err.Error())
-			fmt.Println("warnning: now set logger Common to default console logger")
-			LogCommon = log4z.GetConsoleLogger()
-		} else {
-			fmt.Println("init LogCommon success")
-		}
-		LogWechat, err = log4z.InitLogger("Wechat")
-		if err != nil {
-			fmt.Printf("warnning: log4z.InitLogger(Wechat) return err=%s\r\n", err.Error())
-			fmt.Println("warnning: now set logger Wechat to default console logger")
-			LogWechat = log4z.GetConsoleLogger()
-		} else {
-			fmt.Println("init LogWechat success")
-		}
-	}
-	log4z.UnintConfig()
+	var LoggerCommon *zap.Logger //in code set the instance at a static variable
+	var LoggerWechat *zap.Logger //in code set the instance at a static variable
 
-	fmt.Println("LogCommon", LogCommon)
-	fmt.Println("LogWechat", LogWechat)
-}*/
+	configPath := "./conf/log4z.xml"
+	loggerMap := log4z.InitLogger(configPath)
+	LoggerCommon = getLoggerOrConsole(loggerMap, "Common")
+	LoggerWechat = getLoggerOrConsole(loggerMap, "Wechat")
+
+	fmt.Println("LoggerCommon", LoggerCommon)
+	fmt.Println("LoggerWechat", LoggerWechat)
+}
+
+func getLoggerOrConsole(dict map[string]*zap.Logger, key string) *zap.Logger {
+	logger, ok := dict[key]
+	if ok {
+		fmt.Printf("info: get logger %s success\r\n", key)
+	} else {
+		fmt.Printf("warnning: log4z get logger (%s) failed\r\n", key)
+		fmt.Printf("warnning: now set logger %s to default console logger\r\n", key)
+		logger = log4z.GetConsoleLogger()
+	}
+	return logger
+}

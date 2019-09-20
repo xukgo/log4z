@@ -19,26 +19,26 @@
     <!-- LogPath 日志文件输出的路径-->
     <!-- 公共日志附加介质-->
     <appender name="CommonAppender">
-        <levelDefine size="1" min="debug" max="info" line="false" encoder="json" console="true" maxDay="7" maxBackup="100">
-            <path>D:\\log4z\\info.log</path>
+        <levelDefine size="25" min="debug" max="info" line="false" encoder="console" console="true" maxDay="7" maxBackup="100">
+            <path>log/info.log</path>
         </levelDefine>
-        <levelDefine  size="1" min="warn" max="warn" line="true"  encoder="json" console="true" maxDay="7" maxBackup="100">
-            <path>D:\\log4z\\warn.log</path>
+        <levelDefine  size="25" min="warn" max="warn" line="true"  encoder="console" console="true" maxDay="7" maxBackup="100">
+            <path>log/warn.log</path>
         </levelDefine>
-        <levelDefine  size="1" min="error" max="fatal" line="true"  encoder="json" console="true" maxDay="7" maxBackup="100">
-            <path>D:\\log4z\\error.log</path>
+        <levelDefine  size="25" min="error" max="fatal" line="true"  encoder="console" console="true" maxDay="7" maxBackup="100">
+            <path>log/error.log</path>
         </levelDefine>
     </appender>
     <!-- 自定义日志附加介质-->
     <appender name="WechatAppender">
-        <levelDefine size="1" min="debug" max="info" line="false" encoder="json" console="true" maxDay="7" maxBackup="100">
-            <path>D:\\log4zWechat\\info.log</path>
+        <levelDefine size="25" min="debug" max="info" line="false" encoder="console" console="true" maxDay="7" maxBackup="100">
+            <path>logWechat/info.log</path>
         </levelDefine>
-        <levelDefine  size="1" min="warn" max="warn" line="true"  encoder="json" console="true" maxDay="7" maxBackup="100">
-            <path>D:\\log4zWechat\\warn.log</path>
+        <levelDefine  size="25" min="warn" max="warn" line="true"  encoder="console" console="true" maxDay="7" maxBackup="100">
+            <path>logWechat/warn.log</path>
         </levelDefine>
-        <levelDefine  size="1" min="error" max="fatal" line="true"  encoder="json" console="true" maxDay="7" maxBackup="100">
-            <path>D:\\log4zWechat\\error.log</path>
+        <levelDefine  size="25" min="error" max="fatal" line="true"  encoder="console" console="true" maxDay="7" maxBackup="100">
+            <path>logWechat/error.log</path>
         </levelDefine>
     </appender>
 </log4z>
