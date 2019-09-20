@@ -30,7 +30,7 @@ func getLoggerWithDefault(confModel *confXmlRoot, loggerKey string) *zap.Logger 
 		fmt.Printf("warnning: now set logger %s to default console logger\r\n", loggerKey)
 		logger = GetConsoleLogger()
 	} else {
-		fmt.Printf("info:init logger %s success\r\n", loggerKey)
+		fmt.Printf("info: init logger %s success\r\n", loggerKey)
 	}
 
 	return logger

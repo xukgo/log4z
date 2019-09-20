@@ -1,7 +1,6 @@
 package unitTest
 
 import (
-	"fmt"
 	"github.com/xukgo/log4z"
 	"go.uber.org/zap"
 	"testing"
@@ -38,9 +37,10 @@ func TestConsoleLogger(t *testing.T) {
 	logCommon.Error("test for common appender lv Error", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
 }
 
+/*
+var LoggerCommon *zap.Logger //in code set the instance at a static variable
+var LoggerWechat *zap.Logger //in code set the instance at a static variable
 func ExampleInit() {
-	var LoggerCommon *zap.Logger //in code set the instance at a static variable
-	var LoggerWechat *zap.Logger //in code set the instance at a static variable
 
 	configPath := "./conf/log4z.xml"
 	loggerMap := log4z.InitLogger(configPath)
@@ -62,3 +62,4 @@ func getLoggerOrConsole(dict map[string]*zap.Logger, key string) *zap.Logger {
 	}
 	return logger
 }
+*/
