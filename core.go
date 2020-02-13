@@ -117,7 +117,7 @@ func createLogger(appendModel *appenderXmlModel) (*zap.Logger, error) {
 			return lvl >= minLevel && lvl <= maxLevel
 		})
 
-		logPath := v.LogPath
+		logPath := getAbsUrl(v.LogPath)
 		maxSize := v.LogSize
 		hook := lumberjack.Logger{
 			Filename:   logPath,     // 日志文件路径
