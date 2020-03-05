@@ -3,7 +3,7 @@ package log4z
 import (
 	"encoding/xml"
 	"fmt"
-	"github.com/natefinch/lumberjack"
+	"github.com/xukgo/log4z/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"io/ioutil"
@@ -120,12 +120,13 @@ func createLogger(appendModel *appenderXmlModel) (*zap.Logger, error) {
 		logPath := getAbsUrl(v.LogPath)
 		maxSize := v.LogSize
 		hook := lumberjack.Logger{
-			Filename:   logPath,     // 日志文件路径
-			MaxSize:    maxSize,     // 每个日志文件保存的最大尺寸 单位：M
-			MaxBackups: v.MaxBackup, // 日志文件最多保存多少个备份
-			MaxAge:     v.MaxDays,   // 文件最多保存多少天
-			Compress:   true,        // 是否压缩
-			LocalTime:  true,
+			Filename:      logPath,     // 日志文件路径
+			MaxSize:       maxSize,     // 每个日志文件保存的最大尺寸 单位：M
+			MaxBackups:    v.MaxBackup, // 日志文件最多保存多少个备份
+			MaxAge:        v.MaxDays,   // 文件最多保存多少天
+			Compress:      true,        // 是否压缩
+			CompressDelay: 10,          //N秒后才进行压缩动作
+			LocalTime:     true,
 		}
 
 		var WriteSync zapcore.WriteSyncer

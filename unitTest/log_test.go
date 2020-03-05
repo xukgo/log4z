@@ -4,6 +4,7 @@ import (
 	"github.com/xukgo/log4z"
 	"go.uber.org/zap"
 	"testing"
+	"time"
 )
 
 func TestCallInit(t *testing.T) {
@@ -21,12 +22,15 @@ func TestCallInit(t *testing.T) {
 		t.Fail()
 	}
 
-	logCommon.Info("test for common appender lv Info", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
-	logCommon.Warn("test for common appender lv Warn", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
-	logCommon.Error("test for common appender lv Error", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
-	logWechat.Info("test for wechat appender lv Info", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
-	logWechat.Warn("test for wechat appender lv Warn", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
-	logWechat.Error("test for wechat appender lv Error", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
+	for {
+		logCommon.Info("test for common appender lv Info", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
+		logCommon.Warn("test for common appender lv Warn", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
+		logCommon.Error("test for common appender lv Error", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
+		logWechat.Info("test for wechat appender lv Info", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
+		logWechat.Warn("test for wechat appender lv Warn", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
+		logWechat.Error("test for wechat appender lv Error", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
+		time.Sleep(time.Millisecond)
+	}
 }
 
 func TestConsoleLogger(t *testing.T) {
