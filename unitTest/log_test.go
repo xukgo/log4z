@@ -7,9 +7,11 @@ import (
 	"time"
 )
 
+//"timestamp": "2018-05-08T08:20:40.644+08:00",
 func TestCallInit(t *testing.T) {
 	configPath := "./conf/log4z.xml"
-	loggerDict := log4z.InitLogger(configPath)
+	loggerDict := log4z.InitLogger(configPath,
+		log4z.WithTimeKey("timestamp"), log4z.WithTimeFormat("2006-01-02T15:04:05.999Z07:00"))
 	if len(loggerDict) == 0 {
 		t.Fail()
 	}
@@ -29,7 +31,7 @@ func TestCallInit(t *testing.T) {
 		logWechat.Info("test for wechat appender lv Info", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
 		logWechat.Warn("test for wechat appender lv Warn", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
 		logWechat.Error("test for wechat appender lv Error", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
-		time.Sleep(time.Millisecond)
+		time.Sleep(time.Microsecond * 100)
 	}
 }
 
@@ -42,8 +44,8 @@ func TestConsoleLogger(t *testing.T) {
 }
 
 /*
-var LoggerCommon *zap.Logger //in code set the instance at a static variable
-var LoggerWechat *zap.Logger //in code set the instance at a static variable
+var LoggerCommon *zap.LoggerOption //in code set the instance at a static variable
+var LoggerWechat *zap.LoggerOption //in code set the instance at a static variable
 func ExampleInit() {
 
 	configPath := "./conf/log4z.xml"
@@ -55,7 +57,7 @@ func ExampleInit() {
 	fmt.Println("LoggerWechat", LoggerWechat)
 }
 
-func getLoggerOrConsole(dict map[string]*zap.Logger, key string) *zap.Logger {
+func getLoggerOrConsole(dict map[string]*zap.LoggerOption, key string) *zap.LoggerOption {
 	logger, ok := dict[key]
 	if ok {
 		fmt.Printf("info: get logger %s success\r\n", key)
