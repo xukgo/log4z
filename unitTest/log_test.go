@@ -11,7 +11,7 @@ import (
 func TestCallInit(t *testing.T) {
 	configPath := "./conf/log4z.xml"
 	loggerDict := log4z.InitLogger(configPath,
-		log4z.WithTimeKey("timestamp"), log4z.WithTimeFormat("2006-01-02T15:04:05.999Z07:00"))
+		log4z.WithTimeKey("timestamp"), log4z.WithTimeFormat("2006-01-02T15:04:05.999Z07:00"), log4z.WithCallerSkip(1))
 	if len(loggerDict) == 0 {
 		t.Fail()
 	}
@@ -36,11 +36,11 @@ func TestCallInit(t *testing.T) {
 }
 
 func TestConsoleLogger(t *testing.T) {
-	logCommon := log4z.GetConsoleLogger()
-
+	logCommon := log4z.GetConsoleLogger(log4z.WithCallerSkip(0))
 	logCommon.Info("test for common appender lv Info", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
 	logCommon.Warn("test for common appender lv Warn", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
 	logCommon.Error("test for common appender lv Error", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
+
 }
 
 /*

@@ -13,6 +13,7 @@ func newOptions(options []Option) *Options {
 	opts := new(Options)
 	opts.Compress = DefaultCompress
 	opts.CompressDelay = DefaultCompressDelay
+	opts.CallerSkip = DefaultCallerSkip
 
 	for idx := range options {
 		options[idx](opts)
@@ -118,11 +119,11 @@ func (this *Options) createLogger(appendModel *appenderXmlModel) (*zap.Logger, e
 
 	// 开启开发模式，堆栈跟踪
 	caller := zap.AddCaller()
-	//caller1 := zap.AddCallerSkip(1)
+	callerSkip := zap.AddCallerSkip(this.CallerSkip)
 	// 开启文件及行号
 	development := zap.Development()
 
-	logger := zap.New(Core, caller, development)
+	logger := zap.New(Core, caller, callerSkip, development)
 	return logger, nil
 }
 
@@ -162,10 +163,10 @@ func (this *Options) createConsoleOnlyLogger() *zap.Logger {
 
 	// 开启开发模式，堆栈跟踪
 	caller := zap.AddCaller()
-	//caller1 := zap.AddCallerSkip(1)
+	callerSkip := zap.AddCallerSkip(this.CallerSkip)
 	// 开启文件及行号
 	development := zap.Development()
 
-	logger := zap.New(Core, caller, development)
+	logger := zap.New(Core, caller, callerSkip, development)
 	return logger
 }

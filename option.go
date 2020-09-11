@@ -5,6 +5,7 @@ const (
 	DefaultLevelKey      = "level"
 	DefaultNameKey       = "logger"
 	DefaultCallerKey     = "line"
+	DefaultCallerSkip    = 0
 	DefaultMessageKey    = "msg"
 	DefaultStacktraceKey = "stacktrace"
 	DefaultTimeFormat    = "2006-01-02 15:04:05.000"
@@ -19,6 +20,7 @@ type Options struct {
 	LevelKey      string
 	NameKey       string
 	CallerKey     string
+	CallerSkip    int
 	MessageKey    string
 	StacktraceKey string
 	TimeFormat    string
@@ -52,6 +54,11 @@ func WithNameKey(key string) Option {
 func WithCallerKey(key string) Option {
 	return func(opts *Options) {
 		opts.CallerKey = key
+	}
+}
+func WithCallerSkip(skip int) Option {
+	return func(opts *Options) {
+		opts.CallerSkip = skip
 	}
 }
 func WithMessageKey(key string) Option {
