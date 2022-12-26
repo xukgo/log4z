@@ -100,7 +100,8 @@ func (this *Options) createLogger(appendModel *appenderXmlModel) (*zap.Logger, e
 
 		var WriteSync zapcore.WriteSyncer
 		if v.IsConsole { //控制台和文件同时输出
-			WriteSync = zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), zapcore.AddSync(&hook))
+			breakWriter := mixConsoleSyncSingleton.Load().(*BreakWriter)
+			WriteSync = zapcore.NewMultiWriteSyncer(zapcore.AddSync(breakWriter), zapcore.AddSync(&hook))
 		} else { //文件输出
 			WriteSync = zapcore.NewMultiWriteSyncer(zapcore.AddSync(&hook))
 		}
@@ -127,7 +128,7 @@ func (this *Options) createLogger(appendModel *appenderXmlModel) (*zap.Logger, e
 	return logger, nil
 }
 
-//对于某些没有log配置的场景下，要允许log初始化有一个执行下去的条件，就初始化成这个配置，
+// 对于某些没有log配置的场景下，要允许log初始化有一个执行下去的条件，就初始化成这个配置，
 // 这个配置会在终端打印，相当云fmt.println，并且以console格式，常应用于testcase，不用关心log需要配置初始化
 func (this *Options) createConsoleOnlyLogger() *zap.Logger {
 	var core []zapcore.Core

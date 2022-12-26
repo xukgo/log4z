@@ -3,11 +3,12 @@ package unitTest
 import (
 	"github.com/xukgo/log4z"
 	"go.uber.org/zap"
+	"os"
 	"testing"
 	"time"
 )
 
-//"timestamp": "2018-05-08T08:20:40.644+08:00",
+// "timestamp": "2018-05-08T08:20:40.644+08:00",
 func TestCallInit(t *testing.T) {
 	configPath := "./conf/log4z.xml"
 	loggerDict := log4z.InitLogger(configPath,
@@ -24,6 +25,12 @@ func TestCallInit(t *testing.T) {
 		t.Fail()
 	}
 
+	go func() {
+		time.Sleep(time.Second * 1)
+		log4z.SetMixConsoleLogEnable(false)
+		time.Sleep(time.Second * 3)
+		os.Exit(1)
+	}()
 	for {
 		logCommon.Info("test for common appender lv Info", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
 		logCommon.Warn("test for common appender lv Warn", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))

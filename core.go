@@ -5,11 +5,26 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"io/ioutil"
+	"os"
 	"strings"
+	"sync/atomic"
 )
 
+var mixConsoleSyncSingleton = new(atomic.Value)
+
+func SetMixConsoleLogEnable(enable bool) {
+	v := mixConsoleSyncSingleton.Load()
+	w, ok := v.(*BreakWriter)
+	if !ok {
+		return
+	}
+	w.SetEnable(enable)
+}
+
 func InitLogger(filePath string, options ...Option) map[string]*zap.Logger {
+	var breakWriter = InitBreakWriter(true, os.Stdout)
+	mixConsoleSyncSingleton.Store(&breakWriter)
+
 	loggerMap := make(map[string]*zap.Logger)
 	localRoot, err := initConfig(filePath)
 	if err == nil {
@@ -34,7 +49,7 @@ func getLoggerWithDefault(confModel *confXmlRoot, loggerKey string, options []Op
 }
 
 func initConfig(path string) (*confXmlRoot, error) {
-	content, err := ioutil.ReadFile(path)
+	content, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
