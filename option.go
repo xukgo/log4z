@@ -9,8 +9,8 @@ const (
 	DefaultMessageKey    = "msg"
 	DefaultStacktraceKey = "stacktrace"
 	DefaultTimeFormat    = "2006-01-02 15:04:05.000"
-	DefaultCompress      = true
-	DefaultCompressDelay = 0
+	DefaultCompress      = false
+	DefaultCompressDelay = 30
 )
 
 type Option func(opts *Options)
