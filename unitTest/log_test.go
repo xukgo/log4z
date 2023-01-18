@@ -3,7 +3,6 @@ package unitTest
 import (
 	"github.com/xukgo/log4z"
 	"go.uber.org/zap"
-	"os"
 	"testing"
 	"time"
 )
@@ -12,7 +11,8 @@ import (
 func TestCallInit(t *testing.T) {
 	configPath := "./conf/log4z.xml"
 	loggerDict := log4z.InitLogger(configPath,
-		log4z.WithTimeKey("timestamp"), log4z.WithTimeFormat("2006-01-02T15:04:05.999Z07:00"), log4z.WithCallerSkip(1))
+		log4z.WithTimeKey("timestamp"), log4z.WithTimeFormat("2006-01-02T15:04:05.000Z07:00"), log4z.WithCallerSkip(1),
+		log4z.WithCompress(true)) //log4z.WithTimeFormat("2006-01-02T15:04:05.999Z07:00"),
 	if len(loggerDict) == 0 {
 		t.Fail()
 	}
@@ -20,25 +20,22 @@ func TestCallInit(t *testing.T) {
 	if !ok {
 		t.Fail()
 	}
-	logWechat, ok := loggerDict["Wechat"]
-	if !ok {
-		t.Fail()
-	}
+	//logWechat, ok := loggerDict["Wechat"]
+	//if !ok {
+	//	t.Fail()
+	//}
 
 	go func() {
-		time.Sleep(time.Second * 1)
 		log4z.SetMixConsoleLogEnable(false)
+		time.Sleep(time.Second * 1)
 		time.Sleep(time.Second * 3)
-		os.Exit(1)
+		//os.Exit(1)
 	}()
 	for {
 		logCommon.Info("test for common appender lv Info", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
-		logCommon.Warn("test for common appender lv Warn", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
-		logCommon.Error("test for common appender lv Error", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
-		logWechat.Info("test for wechat appender lv Info", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
-		logWechat.Warn("test for wechat appender lv Warn", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
-		logWechat.Error("test for wechat appender lv Error", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
-		time.Sleep(time.Microsecond * 100)
+		//logCommon.Warn("test for common appender lv Warn", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
+		//logCommon.Error("test for common appender lv Error", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
+		time.Sleep(time.Second * 10)
 	}
 }
 

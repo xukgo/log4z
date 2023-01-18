@@ -19,7 +19,7 @@
     <!-- LogPath 日志文件输出的路径-->
     <!-- 公共日志附加介质-->
     <appender name="CommonAppender">
-        <levelDefine size="1" min="debug" max="info" line="false" encoder="json" console="true" maxDay="7" maxBackup="100">
+        <levelDefine size="1" min="debug" max="info" line="false" encoder="console" console="true" maxDay="7" maxBackup="5">
             <path>log/info.log</path>
         </levelDefine>
         <levelDefine  size="1" min="warn" max="warn" line="true"  encoder="json" console="true" maxDay="7" maxBackup="100">

@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -35,10 +36,10 @@ import (
 )
 
 const (
-	//backupTimeFormat = "2006-01-02T15-04-05.000"
-	backupTimeFormat = "2006-01-02T15-04-05"
-	compressSuffix   = ".gz"
-	defaultMaxSize   = 100
+	//fileTimeFormat = "2006-01-02T15-04-05.000"
+	fileTimeFormat = "2006-01-02T15-04-05"
+	compressSuffix = ".gz"
+	defaultMaxSize = 100
 )
 
 // ensure we always implement io.WriteCloser
@@ -210,28 +211,34 @@ func (l *Logger) rotate() error {
 // openNew opens a new log file for writing, moving any old log file out of the
 // way.  This methods assumes the file has already been closed.
 func (l *Logger) openNew() error {
-	err := os.MkdirAll(l.dir(), 0755)
+	dir := l.dir()
+	err := os.MkdirAll(dir, 0755)
 	if err != nil {
 		return fmt.Errorf("can't make directories for new logfile: %s", err)
 	}
 
-	name := l.filename()
+	name := newFormatName(l.filename(), l.LocalTime)
 	mode := os.FileMode(0600)
-	info, err := os_Stat(name)
-	if err == nil {
-		// Copy the mode off the old logfile.
-		mode = info.Mode()
-		// move the existing file
-		newname := backupName(name, l.LocalTime)
-		if err := os.Rename(name, newname); err != nil {
-			return fmt.Errorf("can't rename log file: %s", err)
-		}
 
-		// this is a no-op anywhere but linux
-		if err := chown(name, info); err != nil {
-			return err
+	/*
+		name := l.filename()
+		mode := os.FileMode(0600)
+		info, err := os_Stat(name)
+		if err == nil {
+			// Copy the mode off the old logfile.
+			mode = info.Mode()
+			// move the existing file
+			newname := newFormatName(name, l.LocalTime)
+			if err := os.Rename(name, newname); err != nil {
+				return fmt.Errorf("can't rename log file: %s", err)
+			}
+
+			// this is a no-op anywhere but linux
+			if err := chown(name, info); err != nil {
+				return err
+			}
 		}
-	}
+	*/
 
 	// we use truncate here because this should only get called when we've moved
 	// the file ourselves. if someone else creates the file in the meantime,
@@ -242,13 +249,17 @@ func (l *Logger) openNew() error {
 	}
 	l.file = f
 	l.size = 0
+
+	linkPath := path.Join(dir, "lastlog")
+	os.Remove(linkPath)
+	os.Symlink(name, linkPath)
 	return nil
 }
 
-// backupName creates a new filename from the given name, inserting a timestamp
+// newFormatName creates a new filename from the given name, inserting a timestamp
 // between the filename and the extension, using the local time if requested
 // (otherwise UTC).
-func backupName(name string, local bool) string {
+func newFormatName(name string, local bool) string {
 	dir := filepath.Dir(name)
 	filename := filepath.Base(name)
 	ext := filepath.Ext(filename)
@@ -258,7 +269,7 @@ func backupName(name string, local bool) string {
 		t = t.UTC()
 	}
 
-	timestamp := t.Format(backupTimeFormat)
+	timestamp := t.Format(fileTimeFormat)
 	return filepath.Join(dir, fmt.Sprintf("%s-%s%s", prefix, timestamp, ext))
 }
 
@@ -268,7 +279,12 @@ func backupName(name string, local bool) string {
 func (l *Logger) openExistingOrNew(writeLen int) error {
 	l.mill()
 
-	filename := l.filename()
+	filename := l.locateFilename()
+	//filename := l.filename()
+	if len(filename) == 0 {
+		return l.openNew()
+	}
+
 	info, err := os_Stat(filename)
 	if os.IsNotExist(err) {
 		return l.openNew()
@@ -299,6 +315,42 @@ func (l *Logger) filename() string {
 	}
 	name := filepath.Base(os.Args[0]) + "-lumberjack.log"
 	return filepath.Join(os.TempDir(), name)
+}
+
+func (l *Logger) locateFilename() string {
+	if len(l.Filename) == 0 {
+		name := filepath.Base(os.Args[0]) + "-lumberjack.log"
+		return filepath.Join(os.TempDir(), name)
+	}
+
+	dirEnts, err := os.ReadDir(l.dir())
+	//files, err := ioutil.ReadDir(l.dir())
+	if err != nil {
+		return ""
+	}
+
+	var logFiles []logInfo
+	prefix, ext := l.prefixAndExt()
+	for _, f := range dirEnts {
+		if f.IsDir() {
+			continue
+		}
+		fi, err := f.Info()
+		if err != nil {
+			continue
+		}
+		if t, err := l.timeFromName(f.Name(), prefix, ext); err == nil {
+			logFiles = append(logFiles, logInfo{t, fi})
+			continue
+		}
+	}
+
+	sort.Sort(byFormatTime(logFiles))
+	if len(logFiles) == 0 {
+		return "" //newFormatName(l.Filename, l.LocalTime)
+	}
+
+	return filepath.Join(l.dir(), logFiles[0].Name())
 }
 
 // millRunOnce performs compression and removal of stale log files.
@@ -404,7 +456,7 @@ func (l *Logger) mill() {
 }
 
 // oldLogFiles returns the list of backup log files stored in the same
-// directory as the current log file, sorted by ModTime
+// directory as the current log file, sorted by ModTime, 排在前面的是时间最近修改的
 func (l *Logger) oldLogFiles() ([]logInfo, error) {
 	dirEnts, err := os.ReadDir(l.dir())
 	//files, err := ioutil.ReadDir(l.dir())
@@ -437,6 +489,12 @@ func (l *Logger) oldLogFiles() ([]logInfo, error) {
 
 	sort.Sort(byFormatTime(logFiles))
 
+	if len(logFiles) == 0 {
+		return logFiles, nil
+	}
+	if filepath.Ext(logFiles[0].Name()) != compressSuffix {
+		return logFiles[1:], nil
+	}
 	return logFiles, nil
 }
 
@@ -451,7 +509,7 @@ func (l *Logger) timeFromName(filename, prefix, ext string) (time.Time, error) {
 		return time.Time{}, errors.New("mismatched extension")
 	}
 	ts := filename[len(prefix) : len(filename)-len(ext)]
-	return time.Parse(backupTimeFormat, ts)
+	return time.Parse(fileTimeFormat, ts)
 }
 
 // max returns the maximum size in bytes of log files before rolling.

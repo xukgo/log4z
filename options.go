@@ -98,6 +98,8 @@ func (this *Options) createLogger(appendModel *appenderXmlModel) (*zap.Logger, e
 			LocalTime:     true,
 		}
 
+		//fixHookLogPath(hook)
+
 		var WriteSync zapcore.WriteSyncer
 		if v.IsConsole { //控制台和文件同时输出
 			breakWriter := mixConsoleSyncSingleton.Load().(*BreakWriter)

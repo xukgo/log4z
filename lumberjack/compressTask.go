@@ -1,7 +1,6 @@
 package lumberjack
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"sync"
@@ -33,7 +32,7 @@ func addWillCompressFile(fileName string, delay int) {
 	if !exist {
 		delayArray = append(delayArray, delayInfo{FileName: fileName, Delay: delay})
 	}
-	fmt.Println(delayArray)
+	//fmt.Println(delayArray)
 	delayArrayLocker.Unlock()
 }
 
