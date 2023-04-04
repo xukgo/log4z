@@ -24,7 +24,9 @@ func TestCallInit(t *testing.T) {
 	}
 
 	//stdlog redirect
+	//zap.RedirectStdLogAt(logCommon, zap.InfoLevel)
 	zap.RedirectStdLogAt(logCommon, zap.ErrorLevel)
+	//zap.RedirectStdLogAt(logCommon, zap.PanicLevel)
 	//logWechat, ok := loggerDict["Wechat"]
 	//if !ok {
 	//	t.Fail()
@@ -36,6 +38,13 @@ func TestCallInit(t *testing.T) {
 		time.Sleep(time.Second * 1)
 		//os.Exit(1)
 	}()
+
+	defer func() {
+		if r := recover(); r != nil {
+			logCommon.Panic("panic", zap.Any("recover", r))
+		}
+	}()
+
 	for {
 		fmt.Println("test stdout 1")
 		log.Println("test stderr 1")
@@ -44,6 +53,8 @@ func TestCallInit(t *testing.T) {
 		//logCommon.Error("test for common appender lv Error", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
 		fmt.Println("test stdout 2")
 		log.Println("test stderr 2")
+		a := make([]int, 0)
+		_ = a[10]
 		time.Sleep(time.Second * 10)
 	}
 }

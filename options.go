@@ -5,7 +5,9 @@ import (
 	"github.com/xukgo/log4z/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"log"
 	"os"
+	"syscall"
 	"time"
 )
 
@@ -172,4 +174,11 @@ func (this *Options) createConsoleOnlyLogger() *zap.Logger {
 
 	logger := zap.New(Core, caller, callerSkip, development)
 	return logger
+}
+
+func redirectStderr(f *os.File) {
+	err := syscall.Dup2(int(f.Fd()), int(os.Stderr.Fd()))
+	if err != nil {
+		log.Fatalf("Failed to redirect stderr to file: %v", err)
+	}
 }
