@@ -12,4 +12,5 @@
 *.out
 log/
 *.log
+lastlog
 *.log.gz

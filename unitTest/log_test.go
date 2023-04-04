@@ -1,8 +1,10 @@
 package unitTest
 
 import (
+	"fmt"
 	"github.com/xukgo/log4z"
 	"go.uber.org/zap"
+	"log"
 	"testing"
 	"time"
 )
@@ -20,21 +22,28 @@ func TestCallInit(t *testing.T) {
 	if !ok {
 		t.Fail()
 	}
+
+	//stdlog redirect
+	zap.RedirectStdLogAt(logCommon, zap.ErrorLevel)
 	//logWechat, ok := loggerDict["Wechat"]
 	//if !ok {
 	//	t.Fail()
 	//}
 
 	go func() {
+		time.Sleep(time.Second * 3)
 		log4z.SetMixConsoleLogEnable(false)
 		time.Sleep(time.Second * 1)
-		time.Sleep(time.Second * 3)
 		//os.Exit(1)
 	}()
 	for {
+		fmt.Println("test stdout 1")
+		log.Println("test stderr 1")
 		logCommon.Info("test for common appender lv Info", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
 		//logCommon.Warn("test for common appender lv Warn", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
 		//logCommon.Error("test for common appender lv Error", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
+		fmt.Println("test stdout 2")
+		log.Println("test stderr 2")
 		time.Sleep(time.Second * 10)
 	}
 }
