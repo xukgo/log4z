@@ -11,6 +11,7 @@ const (
 	DefaultTimeFormat    = "2006-01-02 15:04:05.000"
 	DefaultCompress      = false
 	DefaultCompressDelay = 30
+	DefaultMinLevel      = 0
 )
 
 type Option func(opts *Options)
@@ -26,6 +27,7 @@ type Options struct {
 	TimeFormat    string
 	Compress      bool
 	CompressDelay int
+	MinLevel      int //only for console logger
 }
 
 // WithOptions accepts the whole options config.
@@ -85,5 +87,11 @@ func WithCompress(key bool) Option {
 func WithCompressDelay(key int) Option {
 	return func(opts *Options) {
 		opts.CompressDelay = key
+	}
+}
+
+func WithMinLevel(key int) Option {
+	return func(opts *Options) {
+		opts.MinLevel = key
 	}
 }

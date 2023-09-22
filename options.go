@@ -29,14 +29,11 @@ func newOptions(options []Option) *Options {
 	if len(opts.NameKey) == 0 {
 		opts.NameKey = DefaultNameKey
 	}
-	if len(opts.CallerKey) == 0 {
-		opts.CallerKey = DefaultCallerKey
-	}
+	//if len(opts.CallerKey) == 0 {
+	//	opts.CallerKey = DefaultCallerKey
+	//}
 	if len(opts.MessageKey) == 0 {
 		opts.MessageKey = DefaultMessageKey
-	}
-	if len(opts.StacktraceKey) == 0 {
-		opts.StacktraceKey = DefaultStacktraceKey
 	}
 	if len(opts.StacktraceKey) == 0 {
 		opts.StacktraceKey = DefaultStacktraceKey
@@ -134,36 +131,68 @@ func (this *Options) createLogger(appendModel *appenderXmlModel) (*zap.Logger, e
 
 // 对于某些没有log配置的场景下，要允许log初始化有一个执行下去的条件，就初始化成这个配置，
 // 这个配置会在终端打印，相当云fmt.println，并且以console格式，常应用于testcase，不用关心log需要配置初始化
+// minLevel:print log min level, -1:debug;0:info;1:warn;2:error
 func (this *Options) createConsoleOnlyLogger() *zap.Logger {
 	var core []zapcore.Core
-	levelFilter := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-		return true
-	})
+	minLevel := (zapcore.Level)(this.MinLevel)
+	{
+		levelFilter := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+			return lvl >= minLevel && lvl <= zapcore.WarnLevel
+		})
 
-	encoderConfig := zapcore.EncoderConfig{
-		TimeKey:        this.TimeKey,
-		LevelKey:       this.LevelKey,
-		NameKey:        this.NameKey,
-		CallerKey:      this.CallerKey,
-		MessageKey:     this.MessageKey,
-		StacktraceKey:  this.StacktraceKey,
-		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.LowercaseLevelEncoder,  // 小写编码器
-		EncodeTime:     this.timeEncoder,               // 时间格式
-		EncodeDuration: zapcore.SecondsDurationEncoder, //
-		EncodeCaller:   zapcore.ShortCallerEncoder,     // 短路径编码器
-		EncodeName:     zapcore.FullNameEncoder,
+		encoderConfig := zapcore.EncoderConfig{
+			TimeKey:        this.TimeKey,
+			LevelKey:       this.LevelKey,
+			NameKey:        this.NameKey,
+			CallerKey:      "",
+			MessageKey:     this.MessageKey,
+			StacktraceKey:  this.StacktraceKey,
+			LineEnding:     zapcore.DefaultLineEnding,
+			EncodeLevel:    zapcore.LowercaseLevelEncoder,  // 小写编码器
+			EncodeTime:     this.timeEncoder,               // 时间格式
+			EncodeDuration: zapcore.SecondsDurationEncoder, //
+			EncodeCaller:   zapcore.ShortCallerEncoder,     // 短路径编码器
+			EncodeName:     zapcore.FullNameEncoder,
+		}
+
+		var WriteSync zapcore.WriteSyncer
+		WriteSync = zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout))
+
+		var Encoder zapcore.Encoder
+		Encoder = zapcore.NewConsoleEncoder(encoderConfig)
+
+		co := zapcore.NewCore(Encoder, WriteSync, levelFilter)
+		core = append(core, co)
 	}
+	{
+		levelFilter := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+			return lvl >= minLevel && lvl > zapcore.WarnLevel
+		})
 
-	var WriteSync zapcore.WriteSyncer
-	WriteSync = zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout))
+		encoderConfig := zapcore.EncoderConfig{
+			TimeKey:        this.TimeKey,
+			LevelKey:       this.LevelKey,
+			NameKey:        this.NameKey,
+			CallerKey:      "C",
+			MessageKey:     this.MessageKey,
+			StacktraceKey:  this.StacktraceKey,
+			LineEnding:     zapcore.DefaultLineEnding,
+			EncodeLevel:    zapcore.LowercaseLevelEncoder,  // 小写编码器
+			EncodeTime:     this.timeEncoder,               // 时间格式
+			EncodeDuration: zapcore.SecondsDurationEncoder, //
+			EncodeCaller:   zapcore.ShortCallerEncoder,     // 短路径编码器
+			EncodeName:     zapcore.FullNameEncoder,
+		}
 
-	var Encoder zapcore.Encoder
-	Encoder = zapcore.NewConsoleEncoder(encoderConfig)
+		var WriteSync zapcore.WriteSyncer
+		WriteSync = zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout))
 
-	co := zapcore.NewCore(Encoder, WriteSync, levelFilter)
-	core = append(core, co)
+		var Encoder zapcore.Encoder
+		Encoder = zapcore.NewConsoleEncoder(encoderConfig)
 
+		co := zapcore.NewCore(Encoder, WriteSync, levelFilter)
+		core = append(core, co)
+	}
 	Core := zapcore.NewTee(core...)
 
 	// 开启开发模式，堆栈跟踪

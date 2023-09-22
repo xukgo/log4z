@@ -60,7 +60,8 @@ func TestCallInit(t *testing.T) {
 }
 
 func TestConsoleLogger(t *testing.T) {
-	logCommon := log4z.GetConsoleLogger(log4z.WithCallerSkip(0))
+	logCommon := log4z.GetConsoleLogger(log4z.WithCallerSkip(0), log4z.WithMinLevel(0))
+	logCommon.Debug("test for common appender lv Debug", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
 	logCommon.Info("test for common appender lv Info", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
 	logCommon.Warn("test for common appender lv Warn", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
 	logCommon.Error("test for common appender lv Error", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
