@@ -89,7 +89,7 @@ func TestConsoleLogger(t *testing.T) {
   "teidDl": "0x10000110"
 }`
 	_ = gson
-	logCommon.Info("test for json string", log4z.RawJSONField("json", gson))
+	logCommon.Info("test for json string", log4z.RawJSONField("json", []byte(gson)))
 }
 
 /*
