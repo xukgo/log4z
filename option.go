@@ -12,6 +12,7 @@ const (
 	DefaultCompress      = false
 	DefaultCompressDelay = 30
 	DefaultMinLevel      = 0
+	DefaultLastLogLink   = false
 )
 
 type Option func(opts *Options)
@@ -28,12 +29,19 @@ type Options struct {
 	Compress      bool
 	CompressDelay int
 	MinLevel      int //only for console logger
+	LastLogLink   bool
 }
 
 // WithOptions accepts the whole options config.
 func WithOptions(options Options) Option {
 	return func(opts *Options) {
 		*opts = options
+	}
+}
+
+func WithLastLogLink(br bool) Option {
+	return func(opts *Options) {
+		opts.LastLogLink = br
 	}
 }
 

@@ -49,7 +49,7 @@ func TestCallInit(t *testing.T) {
 		fmt.Println("test stdout 1")
 		log.Println("test stderr 1")
 		logCommon.Info("test for common appender lv Info", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
-		//logCommon.Warn("test for common appender lv Warn", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
+		logCommon.Warn("test for common appender lv Warn", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
 		//logCommon.Error("test for common appender lv Error", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
 		fmt.Println("test stdout 2")
 		log.Println("test stderr 2")
@@ -66,6 +66,30 @@ func TestConsoleLogger(t *testing.T) {
 	logCommon.Warn("test for common appender lv Warn", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
 	logCommon.Error("test for common appender lv Error", zap.Bool("br", true), zap.Int("int", 6001), zap.String("string", "hehehe"))
 
+	var gson = `{
+  "imsi": "450050000000001",
+  "apn": "VzWEntx1",
+  "seidL": "0x10000001",
+  "seidR": "0x1",
+  "sxPeer": [
+    "172.28.139.66"
+  ],
+  "ipAddrs": [
+    "100.69.0.1"
+  ],
+  "startTime": "Thu Feb  1 10:10:32 UTC 2024",
+  "throughULRate": 214689165,
+  "throughDLRate": -1,
+  "pdnType": "IPv4",
+  "upfInstance": "vcp-tenant-ddd",
+  "ppeInstance": "0",
+  "upfSessLoadMbr": "0",
+  "workerId": "1",
+  "teidUl": "0x10000010",
+  "teidDl": "0x10000110"
+}`
+	_ = gson
+	logCommon.Info("test for json string", log4z.RawJSONField("json", gson))
 }
 
 /*

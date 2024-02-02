@@ -112,6 +112,8 @@ type Logger struct {
 	// To solve the problem that logstash(ELK:log micro service module) format required
 	CompressDelay int `json:"compressDelay" yaml:"compressDelay"`
 
+	LastLogLink bool
+
 	size int64
 	file *os.File
 	mu   sync.Mutex
@@ -250,9 +252,11 @@ func (l *Logger) openNew() error {
 	l.file = f
 	l.size = 0
 
-	linkPath := path.Join(dir, "lastlog")
-	os.Remove(linkPath)
-	os.Symlink(name, linkPath)
+	if l.LastLogLink {
+		linkPath := path.Join(dir, "lastlog")
+		os.Remove(linkPath)
+		os.Symlink(name, linkPath)
+	}
 	return nil
 }
 

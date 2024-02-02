@@ -13,7 +13,9 @@ func newOptions(options []Option) *Options {
 	opts := new(Options)
 	opts.Compress = DefaultCompress
 	opts.CompressDelay = DefaultCompressDelay
+	opts.CallerKey = DefaultCallerKey
 	opts.CallerSkip = DefaultCallerSkip
+	opts.LastLogLink = DefaultLastLogLink
 
 	for idx := range options {
 		options[idx](opts)
@@ -93,6 +95,7 @@ func (this *Options) createLogger(appendModel *appenderXmlModel) (*zap.Logger, e
 			Compress:      this.Compress,      // 是否压缩
 			CompressDelay: this.CompressDelay, //N秒后才进行压缩动作
 			LocalTime:     true,
+			LastLogLink:   this.LastLogLink,
 		}
 
 		//fixHookLogPath(hook)
